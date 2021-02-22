@@ -6,11 +6,12 @@ import dev.scpk.scpk.repositories.UserRepository;
 import dev.scpk.scpk.security.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
+@Component
 public class UserService {
 
     @Autowired
