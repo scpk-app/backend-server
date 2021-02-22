@@ -3,11 +3,9 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserRepository;
-import dev.scpk.scpk.security.ExtendedUser;
+import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 

@@ -1,6 +1,6 @@
 package dev.scpk.scpk.configurations;
 
-import dev.scpk.scpk.security.UserDetailService;
+import dev.scpk.scpk.security.authentication.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

@@ -1,4 +1,4 @@
-package dev.scpk.scpk.security;
+package dev.scpk.scpk.security.authentication;
 
 import dev.scpk.scpk.dao.AuthorityDAO;
 import lombok.Data;
