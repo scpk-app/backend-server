@@ -1,15 +1,19 @@
 package dev.scpk.scpk.dao;
 
 import dev.scpk.scpk.dao.acl.PermissionDAO;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "User")
 @Data
+@Builder
 public class UserDAO extends DAO {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

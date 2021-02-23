@@ -1,6 +1,8 @@
 package dev.scpk.scpk.security.authentication;
 
 import dev.scpk.scpk.dao.AuthorityDAO;
+import dev.scpk.scpk.dao.UserDAO;
+import dev.scpk.scpk.services.UserService;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
