@@ -1,19 +1,18 @@
 package dev.scpk.scpk.dao;
 
 import dev.scpk.scpk.dao.acl.PermissionDAO;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "User")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDAO extends DAO {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,17 +37,19 @@ public class UserDAO extends DAO {
     private Set<PaymentGroupDAO> paymentGroups;
 
     @OneToMany(
-            mappedBy = "requestedBy"
+            mappedBy = "requestedBy",
+            fetch = FetchType.LAZY
     )
     private Set<PaymentRequestDAO> paymentRequests;
 
     @OneToMany(
-            mappedBy = "user"
+            mappedBy = "user",
+            fetch = FetchType.LAZY
     )
     private Set<UserBalanceDAO> userBalances;
 
-    @OneToMany(
-            mappedBy = "owner"
-    )
-    private Set<PaymentGroupDAO> ownedPaymentGroups;
+//    @OneToMany(
+//            mappedBy = "owner"
+//    )
+//    private Set<PaymentGroupDAO> ownedPaymentGroups;
 }

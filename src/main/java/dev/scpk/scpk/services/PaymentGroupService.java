@@ -27,7 +27,7 @@ public class PaymentGroupService {
     @Autowired
     private UserBalanceService userBalanceService;
 
-    public PaymentGroupDAO createPaymentGroup() throws UserDoesNotExistsException, ObjectNotHashableException {
+    public PaymentGroupDAO createPaymentGroup(String name, String description) throws UserDoesNotExistsException, ObjectNotHashableException {
         // create payment group
         PaymentGroupDAO paymentGroupDAO = new PaymentGroupDAO();
         // add owner
@@ -48,9 +48,12 @@ public class PaymentGroupService {
         // have to specify payment group it belongs to
         paymentGroupDAO = this.paymentGroupRepository.save(paymentGroupDAO);
         // specify payment group
-        paymentGroupDAO.getUserBalances().add(
-                this.userBalanceService.createUserBalance(paymentGroupDAO)
+        paymentGroupDAO.setUserBalances(
+                Collections.singleton(
+                        this.userBalanceService.createUserBalance(paymentGroupDAO)
+                )
         );
+
 
         // grant all permissions to owner
         this.aclService.grantPermission(paymentGroupDAO, AccessLevel.ALL);

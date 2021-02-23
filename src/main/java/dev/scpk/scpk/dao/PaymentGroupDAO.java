@@ -13,6 +13,9 @@ public class PaymentGroupDAO extends DAO implements SecurityHashable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+    private String description;
+
     @ManyToMany
     @JoinTable(
             name = "payment_group_participants",
@@ -22,16 +25,20 @@ public class PaymentGroupDAO extends DAO implements SecurityHashable {
     private Set<UserDAO> participants;
 
     @OneToMany(
-            mappedBy = "paymentGroup"
+            mappedBy = "paymentGroup",
+            fetch = FetchType.LAZY
     )
     private Set<PaymentRequestDAO> paymentRequests;
 
     @OneToMany(
-            mappedBy = "paymentGroup"
+            mappedBy = "paymentGroup",
+            fetch = FetchType.LAZY
     )
     private Set<UserBalanceDAO> userBalances;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     private UserDAO owner;
 
     private String securityHash;

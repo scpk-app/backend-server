@@ -23,6 +23,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .formLogin().disable()
                 .cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable();
     }
 
     @Bean

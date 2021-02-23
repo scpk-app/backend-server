@@ -14,10 +14,14 @@ public class PaymentRequestDAO extends DAO implements SecurityHashable {
 
     private Double value;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     private UserDAO requestedBy;
 
-    @ManyToOne
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     private PaymentGroupDAO paymentGroup;
 
     private String securityHash;
