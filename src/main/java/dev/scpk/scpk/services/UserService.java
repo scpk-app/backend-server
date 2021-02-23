@@ -3,11 +3,10 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserRepository;
-import dev.scpk.scpk.security.ExtendedUser;
+import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
@@ -35,5 +34,15 @@ public class UserService {
                 userDAO.getEnabled(),
                 userDAO.getAuthoritySet()
         );
+    }
+
+    public UserDAO convertToUserDAO(ExtendedUser extendedUser) throws UserDoesNotExistsException {
+        Optional<UserDAO> userDAOOptional = this.userRepository.findById(extendedUser.getId());
+        if(userDAOOptional.isEmpty()) throw new UserDoesNotExistsException(extendedUser.getUsername());
+        return userDAOOptional.get();
+    }
+
+    public ExtendedUser getLoggedInUser(){
+        return (ExtendedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

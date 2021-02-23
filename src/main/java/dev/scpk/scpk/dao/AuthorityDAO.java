@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Authority")
 @Data
-public class AuthorityDAO implements GrantedAuthority {
+public class AuthorityDAO extends DAO implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

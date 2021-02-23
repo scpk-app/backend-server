@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 @Table(name = "User")
 @Data
-public class UserDAO {
+public class UserDAO extends DAO {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
