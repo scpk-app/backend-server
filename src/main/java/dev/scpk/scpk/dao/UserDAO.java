@@ -1,5 +1,6 @@
 package dev.scpk.scpk.dao;
 
+import dev.scpk.scpk.dao.acl.PermissionDAO;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -22,4 +23,28 @@ public class UserDAO extends DAO {
     @OneToMany(mappedBy = "user")
     @Column(name = "authority")
     private Set<AuthorityDAO> authoritySet;
+
+    @OneToMany(
+            mappedBy = "user",
+            fetch = FetchType.LAZY
+    )
+    private Set<PermissionDAO> permissions;
+
+    @ManyToMany
+    private Set<PaymentGroupDAO> paymentGroups;
+
+    @OneToMany(
+            mappedBy = "requestedBy"
+    )
+    private Set<PaymentRequestDAO> paymentRequests;
+
+    @OneToMany(
+            mappedBy = "user"
+    )
+    private Set<UserBalanceDAO> userBalances;
+
+    @OneToMany(
+            mappedBy = "owner"
+    )
+    private Set<PaymentGroupDAO> ownedPaymentGroups;
 }

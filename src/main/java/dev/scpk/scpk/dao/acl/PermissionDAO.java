@@ -19,7 +19,6 @@ public class PermissionDAO {
     private String securityHash;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "user")
     private UserDAO user;
 
     private Boolean canRead;
