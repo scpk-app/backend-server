@@ -60,6 +60,7 @@ public class PaymentRequestService {
                 paymentGroupDAO.getParticipants(),
                 AccessLevel.READ
         );
+        this.recalculateUserBalances(paymentGroupDAO);
         return this.paymentGroupService.save(paymentGroupDAO);
     }
 
@@ -68,14 +69,17 @@ public class PaymentRequestService {
         this.aclService.hasPermissionOrThrowException(paymentGroupDAO, AccessLevel.WRITE);
         this.aclService.hasPermissionOrThrowException(paymentRequestDAO, AccessLevel.MODIFY);
         paymentGroupDAO.getPaymentRequests().remove(paymentRequestDAO);
+        this.recalculateUserBalances(paymentGroupDAO);
         this.delete(paymentRequestDAO);
         return this.paymentGroupService.save(paymentGroupDAO);
     }
 
-    public PaymentGroupDAO recalculateUserBalances(PaymentGroupDAO paymentGroupDAO){
+    public void recalculateUserBalances(PaymentGroupDAO paymentGroupDAO){
         List<PaymentRequestDAO> paymentRequestDAOS = paymentGroupDAO.getPaymentRequests();
         for(PaymentRequestDAO paymentRequestDAO : paymentRequestDAOS){
             List<UserDAO> chargedUsers = paymentRequestDAO.getCharged();
+            UserDAO requestedBy = paymentRequestDAO.getRequestedBy();
+            if(!chargedUsers.contains(requestedBy)) chargedUsers.add(requestedBy);
             Double requestedValue = paymentRequestDAO.getValue();
             Double singleUserCharge = requestedValue / chargedUsers.size();
             List<UserBalanceDAO> userBalanceDAOS  = paymentGroupDAO.getUserBalances();
@@ -83,11 +87,21 @@ public class PaymentRequestService {
                     userBalanceDAOS.stream()
                             .filter(
                                     o -> chargedUsers.contains(o.getUser())
-                            ).map(
+                            ).filter(
+                                    o -> !o.getUser().equals(requestedBy)
+                            )
+                            .map(
                                     o -> {
-                                    o.setValue(o.getValue() + singleUserCharge);
-                                    return o;
-                                }
+                                        o.getSaldos().stream().map(
+                                                o1 -> {
+                                                    if(o1.getRecipient().equals(requestedBy)) {
+                                                        o1.setValue(o1.getValue() + singleUserCharge);
+                                                    }
+                                                    return o1;
+                                                }
+                                        );
+                                        return o;
+                                    }
                             ).collect(Collectors.toList());
             paymentGroupDAO.setUserBalances(userBalanceDAOS);
         }

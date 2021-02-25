@@ -13,6 +13,9 @@ public class UserBalanceASM extends RepresentationModelAssemblerSupport<UserBala
     @Autowired
     private UserASM userASM;
 
+    @Autowired
+    private PerUserSaldoASM perUserSaldoASM;
+
     public UserBalanceASM(Class<?> controllerClass, Class<UserBalanceModel> resourceType) {
         super(controllerClass, resourceType);
     }
@@ -28,7 +31,9 @@ public class UserBalanceASM extends RepresentationModelAssemblerSupport<UserBala
                 .user(
                         this.userASM.toModel(entity.getUser())
                 )
-                .value(entity.getValue())
+                .saldos(
+                     this.perUserSaldoASM.toCollectionModel(entity.getSaldos())
+                )
                 .build();
     }
 }

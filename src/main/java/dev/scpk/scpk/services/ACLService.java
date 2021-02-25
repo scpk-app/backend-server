@@ -160,7 +160,7 @@ public class ACLService {
         }
     }
 
-    public <T extends DAO> void grantPermission(T object, Collection<UserDAO> users, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+    public <T extends DAO> void grantPermission(T object, List<UserDAO> users, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
         for(UserDAO user : users){
             this.grantPermission(object, user, accessLevel);
         }

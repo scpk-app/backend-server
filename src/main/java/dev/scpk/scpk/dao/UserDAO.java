@@ -56,6 +56,11 @@ public class UserDAO extends DAO {
     )
     private List<PaymentGroupDAO> ownedPaymentGroups;
 
+    @OneToMany(
+            mappedBy = "recipient"
+    )
+    private List<PerUserSaldoDAO> saldos;
+
     public String toString(){
         return String.format(
                 "UserDAO(id=%s, username=%s, displayname=%s, password=%s, enabled=%s",

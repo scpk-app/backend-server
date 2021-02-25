@@ -16,6 +16,7 @@ import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Component
@@ -99,6 +100,7 @@ public class PaymentGroupService {
         }
     }
 
+    @Transactional
     public PaymentGroupDAO leavePaymentGroup(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException, UserHasPendingPaymentRequestException, ObjectNotHashableException, InsufficientPermissionException {
         UserDAO leavingUser =
                 this.userService.convertToUserDAO(
@@ -121,7 +123,7 @@ public class PaymentGroupService {
                         .filter(
                                 o -> o.getUser().equals(leavingUser)
                         ).findFirst().get();
-            paymentGroupDAO.getUserBalances().remove(userBalanceDAO);
+            this.userBalanceService.remove(userBalanceDAO, paymentGroupDAO);
             // remove user from participants list
             paymentGroupDAO.getParticipants().remove(leavingUser);
             this.aclService.revokePermission(paymentGroupDAO, AccessLevel.ALL);

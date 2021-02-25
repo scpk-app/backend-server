@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "UserBalance")
@@ -25,17 +26,20 @@ public class UserBalanceDAO extends DAO implements SecurityHashable {
     )
     private PaymentGroupDAO paymentGroup;
 
-    private Double value;
+    @OneToMany(
+            mappedBy = "userBalance",
+            cascade = CascadeType.REMOVE
+    )
+    private List<PerUserSaldoDAO> saldos;
 
     private String securityHash;
 
     public String toString(){
         return String.format(
-                "UserBalanceDAO(id=%s, userId=%s, paymentGroupId=%s, value=%s",
+                "UserBalanceDAO(id=%s, userId=%s, paymentGroupId=%s",
                 id.toString(),
                 user.getId().toString(),
-                paymentGroup.getId().toString(),
-                value.toString()
+                paymentGroup.getId().toString()
         );
     }
 
