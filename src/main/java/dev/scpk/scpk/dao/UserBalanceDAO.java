@@ -1,8 +1,10 @@
 package dev.scpk.scpk.dao;
 
+import dev.scpk.scpk.exceptions.MissingIdForHashException;
 import dev.scpk.scpk.security.acl.SecurityHashable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.SneakyThrows;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -28,4 +30,24 @@ public class UserBalanceDAO extends DAO implements SecurityHashable {
     private Double value;
 
     private String securityHash;
+
+    public String toString(){
+        return String.format(
+                "UserBalanceDAO(id=%s, userId=%s, paymentGroupId=%s, value=%s",
+                id.toString(),
+                user.getId().toString(),
+                paymentGroup.getId().toString(),
+                value.toString()
+        );
+    }
+
+    @SneakyThrows
+    public int hashCode(){
+        try {
+            return id.hashCode();
+        }
+        catch (NullPointerException ex){
+            throw new MissingIdForHashException(this.getClass().getSimpleName());
+        }
+    }
 }

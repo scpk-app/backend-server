@@ -1,10 +1,12 @@
 package dev.scpk.scpk.dao;
 
 import dev.scpk.scpk.dao.acl.PermissionDAO;
+import dev.scpk.scpk.exceptions.MissingIdForHashException;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,31 +27,55 @@ public class UserDAO extends DAO {
 
     @OneToMany(mappedBy = "user")
     @Column(name = "authority")
-    private Set<AuthorityDAO> authoritySet;
+    private List<AuthorityDAO> authoritySet;
 
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY
     )
-    private Set<PermissionDAO> permissions;
+    private List<PermissionDAO> permissions;
 
     @ManyToMany
-    private Set<PaymentGroupDAO> paymentGroups;
+    private List<PaymentGroupDAO> paymentGroups;
 
     @OneToMany(
             mappedBy = "requestedBy",
             fetch = FetchType.LAZY
     )
-    private Set<PaymentRequestDAO> paymentRequests;
+    private List<PaymentRequestDAO> paymentRequestsMade;
+
+    @ManyToMany
+    private List<PaymentRequestDAO> paymentRequestsReceived;
 
     @OneToMany(
             mappedBy = "user",
             fetch = FetchType.LAZY
     )
-    private Set<UserBalanceDAO> userBalances;
+    private List<UserBalanceDAO> userBalances;
 
-//    @OneToMany(
-//            mappedBy = "owner"
-//    )
-//    private Set<PaymentGroupDAO> ownedPaymentGroups;
+    @OneToMany(
+            mappedBy = "owner"
+    )
+    private List<PaymentGroupDAO> ownedPaymentGroups;
+
+    public String toString(){
+        return String.format(
+                "UserDAO(id=%s, username=%s, displayname=%s, password=%s, enabled=%s",
+                id.toString(),
+                username,
+                displayName,
+                password,
+                enabled.toString()
+        );
+    }
+
+    @SneakyThrows
+    public int hashCode(){
+        try {
+            return id.hashCode();
+        }
+        catch (NullPointerException ex){
+            throw new MissingIdForHashException(this.getClass().getSimpleName());
+        }
+    }
 }

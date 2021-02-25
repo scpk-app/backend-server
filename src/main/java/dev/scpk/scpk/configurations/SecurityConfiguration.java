@@ -16,6 +16,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
+                    .antMatchers("/user/register").permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .httpBasic().realmName("scpk")
