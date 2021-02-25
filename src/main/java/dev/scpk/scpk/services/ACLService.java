@@ -3,8 +3,8 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.DAO;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.dao.acl.PermissionDAO;
-import dev.scpk.scpk.exceptions.InsufficientPermissionException;
-import dev.scpk.scpk.exceptions.ObjectNotHashableException;
+import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.PermissionRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
@@ -28,6 +28,8 @@ public class ACLService {
     @Autowired
     private UserService userService;
 
+    // check if object has a security hash
+    // if not create one
     private static <T extends DAO> Boolean hasSecurityHash(T object) throws ObjectNotHashableException {
         if(
                 Arrays.stream(
@@ -43,6 +45,7 @@ public class ACLService {
         else throw new ObjectNotHashableException(object.getClass());
     }
 
+    // creates security hash based on object class and id
     private static <T extends DAO> void createSecurityHash(T object) throws ObjectNotHashableException {
         Class<?> aClass = object.getClass();
         Long id = object.getId();
@@ -95,6 +98,8 @@ public class ACLService {
         return this.permissionRepository.save(permissionDAO);
     }
 
+    // grants given permission to user
+    // creates new security hash if needed
     public <T extends DAO> void grantPermission(T object, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
         PermissionDAO permissionDAO = this.findPermissionByObjectAndUser(object, extendedUser);
         switch (accessLevel){
@@ -136,6 +141,39 @@ public class ACLService {
         );
     }
 
+    public <T extends DAO> void grantPermission(Collection<T> objects, UserDAO userDAO, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        for(T t : objects){
+            this.grantPermission(t, userDAO, accessLevel);
+        }
+    }
+
+    public <T extends DAO> void grantPermission(Collection<T> objects, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        for(T t : objects){
+            this.grantPermission(t, extendedUser, accessLevel);
+        }
+    }
+
+    public <T extends DAO> void grantPermission(Collection<T> objects, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        ExtendedUser loggedInUser = this.userService.getLoggedInUser();
+        for(T t : objects){
+            this.grantPermission(t, loggedInUser, accessLevel);
+        }
+    }
+
+    public <T extends DAO> void grantPermission(T object, Collection<UserDAO> users, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        for(UserDAO user : users){
+            this.grantPermission(object, user, accessLevel);
+        }
+    }
+
+    public <T extends DAO> void grantPermission(T object, Collection<ExtendedUser> users, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        for(ExtendedUser user : users){
+            this.grantPermission(object, user, accessLevel);
+        }
+    }
+
+    // revoke permission
+    // crete hash if needed
     public <T extends DAO> void revokePermission(T object, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
         PermissionDAO permissionDAO = this.findPermissionByObjectAndUser(object, extendedUser);
         switch (accessLevel){
@@ -167,6 +205,8 @@ public class ACLService {
         );
     }
 
+    // check if user has given permission
+    // create security hash if missing
     public <T extends DAO> Boolean hasPermissionTo(T object, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
         PermissionDAO permissionDAO = this.findPermissionByObjectAndUser(object, extendedUser);
         switch (accessLevel){
@@ -202,6 +242,8 @@ public class ACLService {
         );
     }
 
+    // check if user has permission and throws error if not
+    // create security hash if missing
     public <T extends DAO> void hasPermissionOrThrowException(T object, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException, InsufficientPermissionException {
         if(
                 !this.hasPermissionTo(object, extendedUser, accessLevel)

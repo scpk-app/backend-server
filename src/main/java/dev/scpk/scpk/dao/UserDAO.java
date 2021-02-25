@@ -1,13 +1,11 @@
 package dev.scpk.scpk.dao;
 
 import dev.scpk.scpk.dao.acl.PermissionDAO;
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "User")

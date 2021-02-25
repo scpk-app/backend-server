@@ -3,7 +3,7 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.PaymentGroupDAO;
 import dev.scpk.scpk.dao.UserBalanceDAO;
 import dev.scpk.scpk.dao.UserDAO;
-import dev.scpk.scpk.exceptions.ObjectNotHashableException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserBalanceRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;

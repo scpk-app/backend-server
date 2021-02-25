@@ -1,6 +1,6 @@
 package dev.scpk.scpk.dao;
 
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.security.core.GrantedAuthority;

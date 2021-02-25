@@ -1,4 +1,4 @@
-package dev.scpk.scpk.exceptions;
+package dev.scpk.scpk.exceptions.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

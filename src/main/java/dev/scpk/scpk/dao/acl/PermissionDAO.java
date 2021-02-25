@@ -1,14 +1,11 @@
 package dev.scpk.scpk.dao.acl;
 
 import dev.scpk.scpk.dao.UserDAO;
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
-import dev.scpk.scpk.security.acl.AccessLevel;
-import dev.scpk.scpk.security.authentication.ExtendedUser;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import lombok.Data;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "Permission")

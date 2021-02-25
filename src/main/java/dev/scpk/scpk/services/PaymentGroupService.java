@@ -5,6 +5,11 @@ import dev.scpk.scpk.dao.PaymentRequestDAO;
 import dev.scpk.scpk.dao.UserBalanceDAO;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.*;
+import dev.scpk.scpk.exceptions.paymentGroup.PaymentGroupDoesNotExistsException;
+import dev.scpk.scpk.exceptions.paymentGroup.UserDoesNotBelongToPaymentGroup;
+import dev.scpk.scpk.exceptions.paymentGroup.UserHasPendingPaymentRequestException;
+import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.repositories.PaymentGroupRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.security.authentication.ExtendedUser;
@@ -12,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 @Component
 public class PaymentGroupService {
@@ -68,6 +71,11 @@ public class PaymentGroupService {
             ex.printStackTrace();
         }
         return paymentGroupDAO;
+    }
+
+    // used to only save object, not granting permissions - convention
+    public PaymentGroupDAO save(PaymentGroupDAO paymentGroupDAO){
+        return this.paymentGroupRepository.save(paymentGroupDAO);
     }
 
     public List<PaymentGroupDAO> getAllPaymentGroups(UserDAO userDAO){

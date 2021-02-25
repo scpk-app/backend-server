@@ -1,4 +1,4 @@
-package dev.scpk.scpk.exceptions;
+package dev.scpk.scpk.exceptions.paymentGroup;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

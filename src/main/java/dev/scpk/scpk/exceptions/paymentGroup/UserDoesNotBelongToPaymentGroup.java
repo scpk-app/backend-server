@@ -1,4 +1,4 @@
-package dev.scpk.scpk.exceptions;
+package dev.scpk.scpk.exceptions.paymentGroup;
 
 import dev.scpk.scpk.dao.PaymentGroupDAO;
 import dev.scpk.scpk.dao.UserDAO;

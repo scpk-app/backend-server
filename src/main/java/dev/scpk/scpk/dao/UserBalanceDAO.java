@@ -1,11 +1,9 @@
 package dev.scpk.scpk.dao;
 
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import dev.scpk.scpk.security.acl.SecurityHashable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 
