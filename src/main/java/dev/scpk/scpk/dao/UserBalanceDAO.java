@@ -1,40 +1,43 @@
-package dev.scpk.scpk.dao.acl;
+package dev.scpk.scpk.dao;
 
-import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.MissingIdForHashException;
-import dev.scpk.scpk.security.acl.AccessLevel;
-import dev.scpk.scpk.security.authentication.ExtendedUser;
+import dev.scpk.scpk.security.acl.SecurityHashable;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
-@Table(name = "Permission")
+@Table(name = "UserBalance")
 @Data
-public class PermissionDAO {
+public class UserBalanceDAO extends DAO implements SecurityHashable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String securityHash;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
     private UserDAO user;
 
-    private Boolean canRead;
-    private Boolean canWrite;
-    private Boolean canModify;
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
+    private PaymentGroupDAO paymentGroup;
+
+    private Double value;
+
+    private String securityHash;
 
     public String toString(){
         return String.format(
-                "PermissionDAO(id=%s, securityHash=%s, userId=%s, canRead=%s, canWrite=%s",
+                "UserBalanceDAO(id=%s, userId=%s, paymentGroupId=%s, value=%s",
                 id.toString(),
-                securityHash,
                 user.getId().toString(),
-                canRead.toString(),
-                canWrite.toString()
+                paymentGroup.getId().toString(),
+                value.toString()
         );
     }
 

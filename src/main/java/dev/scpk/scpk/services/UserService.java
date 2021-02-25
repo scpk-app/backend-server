@@ -1,11 +1,14 @@
 package dev.scpk.scpk.services;
 
 import dev.scpk.scpk.dao.UserDAO;
+import dev.scpk.scpk.exceptions.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserRepository;
+import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,10 +19,22 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ACLService aclService;
+
     public UserDAO findOne(String username) throws UserDoesNotExistsException {
         Optional<UserDAO> userDAOOptional = this.userRepository.findByUsername(username);
         if(userDAOOptional.isEmpty()) throw new UserDoesNotExistsException(username);
         else return userDAOOptional.get();
+    }
+
+    public UserDAO findOne(Long id) throws UserDoesNotExistsException, ObjectNotHashableException {
+        Optional<UserDAO> userDAOOptional = this.userRepository.findById(id);
+        if(userDAOOptional.isEmpty()) throw new UserDoesNotExistsException(id.toString());
+        else{
+            // this.aclService.hasPermissionTo(userDAOOptional.get(), AccessLevel.READ);
+            return userDAOOptional.get();
+        }
     }
 
     public static ExtendedUser convertToExtendedUser(UserDAO userDAO){
@@ -44,5 +59,14 @@ public class UserService {
 
     public ExtendedUser getLoggedInUser(){
         return (ExtendedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public UserDAO register(UserDAO userDAO){
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String password = userDAO.getPassword();
+        String encryptedPassword = bCryptPasswordEncoder.encode(password);
+        userDAO.setPassword(encryptedPassword);
+        userDAO.setEnabled(true);
+        return this.userRepository.save(userDAO);
     }
 }

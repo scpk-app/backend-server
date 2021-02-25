@@ -1,6 +1,8 @@
 package dev.scpk.scpk.dao;
 
+import dev.scpk.scpk.exceptions.MissingIdForHashException;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -20,5 +22,24 @@ public class AuthorityDAO extends DAO implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return this.getName();
+    }
+
+    public String toString(){
+        return String.format(
+                "AuthorityDAO(id=%s, name=%s, userId=%s",
+                id.toString(),
+                name,
+                user.getId().toString()
+        );
+    }
+
+    @SneakyThrows
+    public int hashCode(){
+        try {
+            return id.hashCode();
+        }
+        catch (NullPointerException ex){
+            throw new MissingIdForHashException(this.getClass().getSimpleName());
+        }
     }
 }

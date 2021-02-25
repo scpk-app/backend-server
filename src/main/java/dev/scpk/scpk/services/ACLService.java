@@ -3,6 +3,7 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.DAO;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.dao.acl.PermissionDAO;
+import dev.scpk.scpk.exceptions.InsufficientPermissionException;
 import dev.scpk.scpk.exceptions.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.PermissionRepository;
@@ -14,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ACLService {
@@ -32,13 +36,14 @@ public class ACLService {
                         o -> o.isAssignableFrom(SecurityHashable.class)
                 )
         ){
+            if(ACLService.readSecurityHash(object) == null)
+                ACLService.createSecurityHash(object);
             return true;
         }
         else throw new ObjectNotHashableException(object.getClass());
     }
 
     private static <T extends DAO> void createSecurityHash(T object) throws ObjectNotHashableException {
-        ACLService.hasSecurityHash(object);
         Class<?> aClass = object.getClass();
         Long id = object.getId();
         String securityHash = DigestUtils.sha256Hex(aClass.toString() + id.toString());
@@ -46,18 +51,11 @@ public class ACLService {
     }
 
     private static <T extends DAO> String readSecurityHash(T object) throws ObjectNotHashableException {
-        ACLService.hasSecurityHash(object);
         return ((SecurityHashable) object).getSecurityHash();
     }
 
     private <T extends DAO> PermissionDAO findPermissionByObjectAndUser(T object, ExtendedUser extendedUser) throws ObjectNotHashableException, UserDoesNotExistsException {
-        try{
-            ACLService.hasSecurityHash(object);
-        }
-        catch (ObjectNotHashableException ex){
-            ACLService.createSecurityHash(object);
-        }
-
+        ACLService.hasSecurityHash(object);
         UserDAO userDAO =
                 this.userService.convertToUserDAO(
                         extendedUser
@@ -108,9 +106,14 @@ public class ACLService {
                 permissionDAO.setCanWrite(true);
                 break;
             }
+            case MODIFY:{
+                permissionDAO.setCanModify(true);
+                break;
+            }
             case ALL:{
                 permissionDAO.setCanWrite(true);
                 permissionDAO.setCanRead(true);
+                permissionDAO.setCanModify(true);
             }
         }
 
@@ -121,6 +124,14 @@ public class ACLService {
         this.grantPermission(
                 object,
                 this.userService.getLoggedInUser(),
+                accessLevel
+        );
+    }
+
+    public <T extends DAO> void grantPermission(T object, UserDAO userDAO, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
+        this.grantPermission(
+                object,
+                UserService.convertToExtendedUser(userDAO),
                 accessLevel
         );
     }
@@ -136,9 +147,14 @@ public class ACLService {
                 permissionDAO.setCanWrite(false);
                 break;
             }
+            case MODIFY:{
+                permissionDAO.setCanModify(false);
+                break;
+            }
             case ALL:{
                 permissionDAO.setCanWrite(false);
                 permissionDAO.setCanRead(false);
+                permissionDAO.setCanModify(false);
             }
         }
     }
@@ -162,9 +178,15 @@ public class ACLService {
                 if(permissionDAO.getCanRead()) return true;
                 break;
             }
+            case MODIFY:{
+                if(permissionDAO.getCanModify()) return true;
+                break;
+            }
             case ALL:{
                 if(permissionDAO.getCanWrite()){
-                    if(permissionDAO.getCanRead()) return true;
+                    if(permissionDAO.getCanRead()){
+                        if(permissionDAO.getCanModify()) return true;
+                    }
                 }
                 break;
             }
@@ -178,5 +200,42 @@ public class ACLService {
                 this.userService.getLoggedInUser(),
                 accessLevel
         );
+    }
+
+    public <T extends DAO> void hasPermissionOrThrowException(T object, ExtendedUser extendedUser, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException, InsufficientPermissionException {
+        if(
+                !this.hasPermissionTo(object, extendedUser, accessLevel)
+        ){
+            throw new InsufficientPermissionException(
+                    object.getClass(),
+                    accessLevel,
+                    extendedUser
+            );
+        }
+    }
+
+    public <T extends DAO> void hasPermissionOrThrowException(T object, AccessLevel accessLevel) throws UserDoesNotExistsException, InsufficientPermissionException, ObjectNotHashableException {
+        this.hasPermissionOrThrowException(object, this.userService.getLoggedInUser(), accessLevel);
+    }
+
+    public  <T extends DAO> List<T> filter(Collection<T> collection, AccessLevel accessLevel){
+        return this.filter(
+                collection,
+                accessLevel,
+                this.userService.getLoggedInUser()
+        );
+    }
+
+    public  <T extends DAO> List<T> filter(Collection<T> collection, AccessLevel accessLevel, ExtendedUser extendedUser){
+        return collection.stream().filter(o -> {
+            try {
+                return this.hasPermissionTo(o, extendedUser, accessLevel);
+            } catch (ObjectNotHashableException e) {
+                e.printStackTrace();
+            } catch (UserDoesNotExistsException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }).collect(Collectors.toList());
     }
 }
