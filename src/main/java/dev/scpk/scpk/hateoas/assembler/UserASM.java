@@ -1,7 +1,7 @@
 package dev.scpk.scpk.hateoas.assembler;
 
 import dev.scpk.scpk.dao.UserDAO;
-import dev.scpk.scpk.hateoas.model.UserModel;
+import dev.scpk.scpk.hateoas.model.full.UserModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 

@@ -7,8 +7,10 @@ import dev.scpk.scpk.exceptions.paymentGroup.UserDoesNotBelongToRequestToJoinLis
 import dev.scpk.scpk.exceptions.paymentGroup.UserHasPendingPaymentRequestException;
 import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
 import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
+import dev.scpk.scpk.hateoas.assembler.BriefPaymentGroupASM;
 import dev.scpk.scpk.hateoas.assembler.PaymentGroupASM;
-import dev.scpk.scpk.hateoas.model.PaymentGroupModel;
+import dev.scpk.scpk.hateoas.model.brief.BriefPaymentGroupModel;
+import dev.scpk.scpk.hateoas.model.full.PaymentGroupModel;
 import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.services.ACLService;
 import dev.scpk.scpk.services.PaymentGroupService;
@@ -34,6 +36,9 @@ public class PaymentGroupController {
 
     @Autowired
     private ACLService aclService;
+
+    @Autowired
+    private BriefPaymentGroupASM briefPaymentGroupASM;
 
     @PostMapping("/create")
     public PaymentGroupModel createPaymentGroup(
@@ -79,17 +84,21 @@ public class PaymentGroupController {
     @GetMapping("/all")
     public CollectionModel<PaymentGroupModel> getAll() throws UserDoesNotExistsException {
         List<PaymentGroupDAO> paymentGroupDAOList =
-                this.paymentGroupService.getAllPaymentGroups(
-                        this.userService.convertToUserDAO(
-                                this.userService.getLoggedInUser()
-                        )
-                );
+                this.paymentGroupService.getAllPaymentGroups();
 
         return this.paymentGroupASM
                 .toCollectionModel(paymentGroupDAOList)
                 .add(
                         WebMvcLinkBuilder.linkTo(PaymentGroupController.class).withSelfRel()
                 );
+    }
+
+    @GetMapping("/all/brief")
+    public CollectionModel<BriefPaymentGroupModel> getAllPaymentGroupsBrief() throws UserDoesNotExistsException {
+        List<PaymentGroupDAO> paymentGroupDAOList =
+                this.paymentGroupService.getAllPaymentGroups();
+        return this.briefPaymentGroupASM.toCollectionModel(paymentGroupDAOList)
+                .add(WebMvcLinkBuilder.linkTo(PaymentGroupController.class).withSelfRel());
     }
 
     @PatchMapping("/requestJoin")

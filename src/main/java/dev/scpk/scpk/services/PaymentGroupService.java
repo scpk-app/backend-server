@@ -80,6 +80,14 @@ public class PaymentGroupService {
         return this.paymentGroupRepository.save(paymentGroupDAO);
     }
 
+    public List<PaymentGroupDAO> getAllPaymentGroups() throws UserDoesNotExistsException {
+        return this.getAllPaymentGroups(
+                this.userService.convertToUserDAO(
+                        this.userService.getLoggedInUser()
+                )
+        );
+    }
+
     public List<PaymentGroupDAO> getAllPaymentGroups(UserDAO userDAO){
         List<PaymentGroupDAO> paymentGroupDAOS = this.paymentGroupRepository.findAllByParticipants(userDAO);
         paymentGroupDAOS =

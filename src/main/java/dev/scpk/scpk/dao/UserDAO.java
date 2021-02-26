@@ -5,6 +5,7 @@ import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -17,8 +18,11 @@ public class UserDAO extends DAO {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String username;
+    @NotNull
     private String displayName;
+    @NotNull
     private String password;
 
     private Boolean enabled;

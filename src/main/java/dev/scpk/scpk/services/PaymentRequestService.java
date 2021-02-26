@@ -77,6 +77,42 @@ public class PaymentRequestService {
             return paymentRequestDAO.get();
     }
 
+    public List<PaymentRequestDAO> getAllRequested(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException {
+        List<PaymentRequestDAO> paymentRequestDAOS = this.findAllByPaymentGroup(paymentGroupDAO);
+        UserDAO loggedInUser = this.userService.convertToUserDAO(
+                this.userService.getLoggedInUser()
+        );
+        paymentRequestDAOS = paymentRequestDAOS.stream()
+                .filter(
+                        paymentRequestDAO -> paymentRequestDAO.getRequestedBy().equals(loggedInUser)
+                ).collect(Collectors.toList());
+        return this.aclService.filter(paymentRequestDAOS, AccessLevel.READ);
+    }
+
+    // fetch payment request and filter by permission
+    public List<PaymentRequestDAO> getAllInWhichUserCharged(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException {
+        List<PaymentRequestDAO> paymentRequestDAOS = this.findAllByPaymentGroup(paymentGroupDAO);
+        UserDAO loggedInUser = this.userService.convertToUserDAO(
+                this.userService.getLoggedInUser()
+        );
+        paymentRequestDAOS = paymentRequestDAOS.stream()
+                .filter(
+                        paymentRequestDAO -> !paymentRequestDAO.getRequestedBy().equals(loggedInUser)
+                )
+                .filter(
+                        paymentRequestDAO -> paymentRequestDAO.getCharged().stream()
+                                .anyMatch(
+                                        userDAO -> userDAO.equals(loggedInUser)
+                                )
+                ).collect(Collectors.toList());
+        return this.aclService.filter(paymentRequestDAOS, AccessLevel.READ);
+    }
+
+    // fetch all payment requests but do not evaluate permissions
+    public List<PaymentRequestDAO> findAllByPaymentGroup(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException {
+        return this.paymentRequestRepository.findAllByPaymentGroup(paymentGroupDAO);
+    }
+
     public PaymentGroupDAO addPaymentToPaymentGroup(PaymentGroupDAO paymentGroupDAO, PaymentRequestDAO paymentRequestDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException, PaymentGroupDoesNotExistsException {
         paymentGroupDAO = this.paymentGroupService.findById(paymentGroupDAO.getId());
         this.aclService.hasPermissionOrThrowException(paymentGroupDAO, AccessLevel.WRITE);

@@ -1,15 +1,9 @@
-package dev.scpk.scpk.hateoas.model;
+package dev.scpk.scpk.hateoas.model.full;
 
-import dev.scpk.scpk.dao.PaymentRequestDAO;
-import dev.scpk.scpk.dao.UserBalanceDAO;
-import dev.scpk.scpk.dao.UserDAO;
 import lombok.*;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
-
-import java.util.List;
-import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Relation(itemRelation = "paymentGroup", collectionRelation = "paymentsGroup")
