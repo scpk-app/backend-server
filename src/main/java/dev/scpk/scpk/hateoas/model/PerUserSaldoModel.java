@@ -1,25 +1,20 @@
 package dev.scpk.scpk.hateoas.model;
 
-import dev.scpk.scpk.dao.PaymentGroupDAO;
 import dev.scpk.scpk.dao.UserDAO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
-
-import javax.persistence.*;
-import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor
-@Relation(itemRelation = "userBalance", collectionRelation = "userBalances")
-public class UserBalanceModel extends RepresentationModel<UserBalanceModel> {
+@Relation(itemRelation = "saldo", collectionRelation = "saldos")
+public class PerUserSaldoModel extends RepresentationModel<PerUserSaldoModel> {
     private Long id;
-    private UserModel user;
-    private CollectionModel<PerUserSaldoModel> saldos;
+    private UserModel recipient;
+    private Double value;
 }

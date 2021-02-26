@@ -1,19 +1,20 @@
 package dev.scpk.scpk.services;
 
 import dev.scpk.scpk.dao.UserDAO;
-import dev.scpk.scpk.exceptions.ObjectNotHashableException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserRepository;
-import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Component
+@Service
 public class UserService {
 
     @Autowired

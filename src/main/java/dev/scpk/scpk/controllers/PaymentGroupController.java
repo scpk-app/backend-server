@@ -3,6 +3,10 @@ package dev.scpk.scpk.controllers;
 import dev.scpk.scpk.dao.PaymentGroupDAO;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.*;
+import dev.scpk.scpk.exceptions.paymentGroup.UserDoesNotBelongToRequestToJoinListException;
+import dev.scpk.scpk.exceptions.paymentGroup.UserHasPendingPaymentRequestException;
+import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.hateoas.assembler.PaymentGroupASM;
 import dev.scpk.scpk.hateoas.model.PaymentGroupModel;
 import dev.scpk.scpk.security.acl.AccessLevel;
@@ -101,7 +105,7 @@ public class PaymentGroupController {
     public PaymentGroupModel joinGroup(
             @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO,
             @RequestParam("user_id") UserDAO userDAO
-    ) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToPaymentGroup {
+    ) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToRequestToJoinListException {
         PaymentGroupDAO paymentGroupDAOModified =
                 this.paymentGroupService.approveToPaymentGroup(
                         paymentGroupDAO, userDAO

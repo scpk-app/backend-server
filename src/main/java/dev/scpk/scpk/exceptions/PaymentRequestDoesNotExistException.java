@@ -1,6 +1,5 @@
 package dev.scpk.scpk.exceptions;
 
-import dev.scpk.scpk.dao.PaymentRequestDAO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +7,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
-public class UserHasPendingPaymentRequestException extends Exception{
-    private PaymentRequestDAO paymentRequestDAO;
+public class PaymentRequestDoesNotExistException extends Exception{
+    private Long id;
 }

@@ -1,4 +1,4 @@
-package dev.scpk.scpk.exceptions;
+package dev.scpk.scpk.exceptions.security;
 
 import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.security.authentication.ExtendedUser;

@@ -1,13 +1,11 @@
 package dev.scpk.scpk.dao;
 
 import dev.scpk.scpk.dao.acl.PermissionDAO;
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "User")
@@ -57,6 +55,11 @@ public class UserDAO extends DAO {
             mappedBy = "owner"
     )
     private List<PaymentGroupDAO> ownedPaymentGroups;
+
+    @OneToMany(
+            mappedBy = "recipient"
+    )
+    private List<PerUserSaldoDAO> saldos;
 
     public String toString(){
         return String.format(

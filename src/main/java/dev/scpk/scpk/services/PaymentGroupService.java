@@ -5,17 +5,22 @@ import dev.scpk.scpk.dao.PaymentRequestDAO;
 import dev.scpk.scpk.dao.UserBalanceDAO;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.*;
+import dev.scpk.scpk.exceptions.paymentGroup.PaymentGroupDoesNotExistsException;
+import dev.scpk.scpk.exceptions.paymentGroup.UserDoesNotBelongToRequestToJoinListException;
+import dev.scpk.scpk.exceptions.paymentGroup.UserHasPendingPaymentRequestException;
+import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
+import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.repositories.PaymentGroupRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-@Component
+@Service
 public class PaymentGroupService {
     @Autowired
     private PaymentGroupRepository paymentGroupRepository;
@@ -70,6 +75,11 @@ public class PaymentGroupService {
         return paymentGroupDAO;
     }
 
+    // used to only save object, not granting permissions - convention
+    public PaymentGroupDAO save(PaymentGroupDAO paymentGroupDAO){
+        return this.paymentGroupRepository.save(paymentGroupDAO);
+    }
+
     public List<PaymentGroupDAO> getAllPaymentGroups(UserDAO userDAO){
         List<PaymentGroupDAO> paymentGroupDAOS = this.paymentGroupRepository.findAllByParticipants(userDAO);
         paymentGroupDAOS =
@@ -91,6 +101,7 @@ public class PaymentGroupService {
         }
     }
 
+    @Transactional
     public PaymentGroupDAO leavePaymentGroup(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException, UserHasPendingPaymentRequestException, ObjectNotHashableException, InsufficientPermissionException {
         UserDAO leavingUser =
                 this.userService.convertToUserDAO(
@@ -113,7 +124,7 @@ public class PaymentGroupService {
                         .filter(
                                 o -> o.getUser().equals(leavingUser)
                         ).findFirst().get();
-            paymentGroupDAO.getUserBalances().remove(userBalanceDAO);
+            this.userBalanceService.remove(userBalanceDAO, paymentGroupDAO);
             // remove user from participants list
             paymentGroupDAO.getParticipants().remove(leavingUser);
             this.aclService.revokePermission(paymentGroupDAO, AccessLevel.ALL);
@@ -142,7 +153,7 @@ public class PaymentGroupService {
         return paymentGroupDAO;
     }
 
-    public PaymentGroupDAO approveToPaymentGroup(PaymentGroupDAO paymentGroupDAO, UserDAO userDAO) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToPaymentGroup {
+    public PaymentGroupDAO approveToPaymentGroup(PaymentGroupDAO paymentGroupDAO, UserDAO userDAO) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToRequestToJoinListException {
         // check if user has proper permissions to read and write to group
         ExtendedUser userToAdd = UserService.convertToExtendedUser(userDAO);
         ExtendedUser userAdding = this.userService.getLoggedInUser();
@@ -152,14 +163,15 @@ public class PaymentGroupService {
         if(paymentGroupDAO.getRequestedToJoin().contains(userDAO)) {
             paymentGroupDAO.getParticipants().add(userDAO);
             UserBalanceDAO userBalanceDAO = this.userBalanceService.createUserBalance(userDAO, paymentGroupDAO);
-            paymentGroupDAO.getUserBalances().add(userBalanceDAO);
+            // make duplicate in to model conversion
+            // paymentGroupDAO.getUserBalances().add(userBalanceDAO);
             paymentGroupDAO.getRequestedToJoin().remove(userDAO);
             this.aclService.grantPermission(paymentGroupDAO, userToAdd, AccessLevel.READ);
             this.aclService.grantPermission(paymentGroupDAO, userToAdd, AccessLevel.WRITE);
             return this.paymentGroupRepository.save(paymentGroupDAO);
         }
         else
-            throw new UserDoesNotBelongToPaymentGroup(paymentGroupDAO, userDAO);
+            throw new UserDoesNotBelongToRequestToJoinListException(paymentGroupDAO, userDAO);
     }
 
     public PaymentGroupDAO changeDescription(PaymentGroupDAO paymentGroupDAO, String newDescription) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException {

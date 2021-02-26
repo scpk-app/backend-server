@@ -1,13 +1,12 @@
 package dev.scpk.scpk.dao;
 
-import dev.scpk.scpk.exceptions.MissingIdForHashException;
+import dev.scpk.scpk.exceptions.security.MissingIdForHashException;
 import dev.scpk.scpk.security.acl.SecurityHashable;
 import lombok.Data;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "PaymentGroup")
