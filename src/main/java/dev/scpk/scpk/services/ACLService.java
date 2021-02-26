@@ -82,6 +82,7 @@ public class ACLService {
             permissionDAO.setUser(userDAO);
             permissionDAO.setCanRead(false);
             permissionDAO.setCanWrite(false);
+            permissionDAO.setCanModify(false);
         }
         else permissionDAO = permissionDAOOptional.get();
 
