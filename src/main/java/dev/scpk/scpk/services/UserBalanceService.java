@@ -11,11 +11,13 @@ import dev.scpk.scpk.repositories.UserBalanceRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Service
 public class UserBalanceService {
     @Autowired
     private UserBalanceRepository userBalanceRepository;

@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
-public class UserDoesNotBelongToPaymentGroup extends Exception{
+public class UserDoesNotBelongToRequestToJoinListException extends Exception{
     private PaymentGroupDAO paymentGroupDAO;
     private UserDAO userDAO;
 }
