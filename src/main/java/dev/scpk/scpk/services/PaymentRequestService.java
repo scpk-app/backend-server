@@ -103,6 +103,7 @@ public class PaymentRequestService {
 
     public void recalculateUserBalances(PaymentGroupDAO paymentGroupDAO){
         List<PaymentRequestDAO> paymentRequestDAOS = paymentGroupDAO.getPaymentRequests();
+        // zero all per user saldos
         paymentGroupDAO.setUserBalances(
                 paymentGroupDAO.getUserBalances().stream().map(
                         balanceDAO -> {
@@ -118,6 +119,7 @@ public class PaymentRequestService {
                         }
                 ).collect(Collectors.toList())
         );
+        // calculate new per user salds
         for(PaymentRequestDAO paymentRequestDAO : paymentRequestDAOS){
             List<UserDAO> chargedUsers = paymentRequestDAO.getCharged();
             UserDAO requestedBy = paymentRequestDAO.getRequestedBy();
@@ -128,8 +130,10 @@ public class PaymentRequestService {
             userBalanceDAOS =
                     userBalanceDAOS.stream()
                             .filter(
+                                    // filter to match only users charged by given payment request
                                     balanceDAO -> chargedUsers.contains(balanceDAO.getUser())
                             ).map(
+                                    // find saldo of user requesting payment and add requested value
                                 balanceDAO -> {
                                         List<PerUserSaldoDAO> newPerUserSaldos =
                                                 balanceDAO.getSaldos().stream().map(
@@ -148,6 +152,65 @@ public class PaymentRequestService {
                             ).collect(Collectors.toList());
             paymentGroupDAO.setUserBalances(userBalanceDAOS);
         }
+        // combine saldos balance for e.g. if two users charges each by equal value then each of them has 0 balance
+        List<UserBalanceDAO> userBalanceDAOS =
+                paymentGroupDAO.getUserBalances();
+        // for each user balance for user a
+        for(int userA = 0; userA < userBalanceDAOS.size(); userA++){
+            // values user a has to pay to other users
+            List<PerUserSaldoDAO> userAPerUserSaldos = userBalanceDAOS.get(userA).getSaldos();
+            // user a on its own
+            UserDAO userADAO = userBalanceDAOS.get(userA).getUser();
+            // check each entry in per user saldos
+            for(int paymentRecipient = 0; paymentRecipient < userAPerUserSaldos.size(); paymentRecipient++){
+                // value user a must pay to recipient user
+                PerUserSaldoDAO recipientPerUserSaldoForUserA = userAPerUserSaldos.get(paymentRecipient);
+                // find user balance for user we have to pay / recipient user
+                for(int userB = 0; userB < userBalanceDAOS.size(); userB++){
+                    if(userA == userB) continue;
+                    UserBalanceDAO userBBalance = userBalanceDAOS.get(userB);
+                    // if user match
+                    if(
+                            recipientPerUserSaldoForUserA.getRecipient().equals(
+                                    userBBalance.getUser()
+                            )
+                    ){
+                        // find per user saldo of user a in balance of user b
+                        List<PerUserSaldoDAO> userBPerUserSaldos =
+                                userBBalance.getSaldos();
+                        for(int paymentRequester = 0; paymentRequester < userBPerUserSaldos.size(); paymentRequester++){
+                            // value user b has to pay user a
+                            PerUserSaldoDAO requesterPerUserSaldo = userBPerUserSaldos.get(paymentRequester);
+                            // if names match we found saldo of user a in balance of user b
+                            if(requesterPerUserSaldo.getRecipient().equals(userADAO)){
+                                Double diff = recipientPerUserSaldoForUserA.getValue() - requesterPerUserSaldo.getValue();
+                                // if difference is negative this means
+                                // user a requested more
+                                if(diff < 0){
+                                    recipientPerUserSaldoForUserA.setValue(0d);
+                                    requesterPerUserSaldo.setValue(Math.abs(diff));
+                                }
+                                // if difference is positive then user b ordered more money than user a
+                                else{
+                                    recipientPerUserSaldoForUserA.setValue(Math.abs(diff));
+                                    requesterPerUserSaldo.setValue(0d);
+                                }
+                                userBPerUserSaldos.remove(paymentRequester);
+                                userBPerUserSaldos.add(paymentRequester, requesterPerUserSaldo);
+                                break;
+                            }
+                        }
+                        userBalanceDAOS.remove(userB);
+                        userBalanceDAOS.add(userB, userBBalance);
+                        break;
+                    }
+                }
+                userAPerUserSaldos.remove(paymentRecipient);
+                userAPerUserSaldos.add(paymentRecipient, recipientPerUserSaldoForUserA);
+            }
+            userBalanceDAOS.get(userA).setSaldos(userAPerUserSaldos);
+        }
+        paymentGroupDAO.setUserBalances(userBalanceDAOS);
     }
 
     public void delete(PaymentRequestDAO paymentRequestDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException {
