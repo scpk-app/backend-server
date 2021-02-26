@@ -8,18 +8,17 @@ import dev.scpk.scpk.exceptions.paymentGroup.PaymentGroupDoesNotExistsException;
 import dev.scpk.scpk.exceptions.security.InsufficientPermissionException;
 import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.hateoas.assembler.PaymentGroupASM;
-import dev.scpk.scpk.hateoas.model.PaymentGroupModel;
+import dev.scpk.scpk.hateoas.assembler.PaymentRequestASM;
+import dev.scpk.scpk.hateoas.model.full.PaymentGroupModel;
+import dev.scpk.scpk.hateoas.model.full.PaymentRequestModel;
 import dev.scpk.scpk.services.PaymentRequestService;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/payment")
@@ -29,6 +28,9 @@ public class PaymentRequestController {
 
     @Autowired
     private PaymentGroupASM paymentGroupASM;
+
+    @Autowired
+    private PaymentRequestASM paymentRequestASM;
 
     @PatchMapping("/add")
     public PaymentGroupModel addPayment(
@@ -54,6 +56,26 @@ public class PaymentRequestController {
         PaymentGroupDAO paymentGroupDAO1 =
                 this.paymentRequestService.removePaymentRequest(paymentGroupDAO, paymentRequestDAO);
         return this.paymentGroupASM.toModel(paymentGroupDAO1)
+                .add(WebMvcLinkBuilder.linkTo(PaymentRequestController.class).withSelfRel());
+    }
+
+    @GetMapping("/get/charged/byGroup")
+    public CollectionModel<PaymentRequestModel> getInWhichCharged(
+            @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO
+    ) throws UserDoesNotExistsException {
+        List<PaymentRequestDAO> paymentRequestDAOList =
+                this.paymentRequestService.getAllInWhichUserCharged(paymentGroupDAO);
+        return this.paymentRequestASM.toCollectionModel(paymentRequestDAOList)
+                .add(WebMvcLinkBuilder.linkTo(PaymentRequestController.class).withSelfRel());
+    }
+
+    @GetMapping("/get/requested/byGroup")
+    public CollectionModel<PaymentRequestModel> getInWhichRequests(
+            @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO
+    ) throws UserDoesNotExistsException {
+        List<PaymentRequestDAO> paymentRequestDAOList =
+                this.paymentRequestService.getAllRequested(paymentGroupDAO);
+        return this.paymentRequestASM.toCollectionModel(paymentRequestDAOList)
                 .add(WebMvcLinkBuilder.linkTo(PaymentRequestController.class).withSelfRel());
     }
 }

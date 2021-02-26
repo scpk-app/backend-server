@@ -1,4 +1,4 @@
-package dev.scpk.scpk.hateoas.model;
+package dev.scpk.scpk.hateoas.model.full;
 
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;

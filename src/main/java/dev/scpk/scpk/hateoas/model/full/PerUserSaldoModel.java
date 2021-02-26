@@ -1,6 +1,5 @@
-package dev.scpk.scpk.hateoas.model;
+package dev.scpk.scpk.hateoas.model.full;
 
-import dev.scpk.scpk.dao.UserDAO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,8 +1,7 @@
 package dev.scpk.scpk.hateoas.assembler;
 
 import dev.scpk.scpk.dao.AuthorityDAO;
-import dev.scpk.scpk.hateoas.model.AuthorityModel;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.scpk.scpk.hateoas.model.full.AuthorityModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 

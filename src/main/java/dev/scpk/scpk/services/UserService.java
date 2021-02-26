@@ -3,6 +3,7 @@ package dev.scpk.scpk.services;
 import dev.scpk.scpk.dao.UserDAO;
 import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
+import dev.scpk.scpk.exceptions.security.UserAlreadyExistsException;
 import dev.scpk.scpk.repositories.UserRepository;
 import dev.scpk.scpk.security.authentication.ExtendedUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,15 @@ public class UserService {
         return (ExtendedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public UserDAO register(UserDAO userDAO){
+    private Boolean checkIfUserExists(UserDAO userDAO){
+        return this.userRepository.existsByUsername(
+                userDAO.getUsername()
+        );
+    }
+
+    public UserDAO register(UserDAO userDAO) throws UserAlreadyExistsException {
+        if(this.checkIfUserExists(userDAO))
+            throw new UserAlreadyExistsException();
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String password = userDAO.getPassword();
         String encryptedPassword = bCryptPasswordEncoder.encode(password);

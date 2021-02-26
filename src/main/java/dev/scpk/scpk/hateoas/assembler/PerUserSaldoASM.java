@@ -1,7 +1,7 @@
 package dev.scpk.scpk.hateoas.assembler;
 
 import dev.scpk.scpk.dao.PerUserSaldoDAO;
-import dev.scpk.scpk.hateoas.model.PerUserSaldoModel;
+import dev.scpk.scpk.hateoas.model.full.PerUserSaldoModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
