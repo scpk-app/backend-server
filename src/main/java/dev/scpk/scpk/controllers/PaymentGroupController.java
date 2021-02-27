@@ -15,6 +15,8 @@ import dev.scpk.scpk.security.acl.AccessLevel;
 import dev.scpk.scpk.services.ACLService;
 import dev.scpk.scpk.services.PaymentGroupService;
 import dev.scpk.scpk.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -45,12 +47,14 @@ public class PaymentGroupController {
     @Autowired
     private BriefPaymentGroupASM briefPaymentGroupASM;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @PostMapping("/create")
     public PaymentGroupModel createPaymentGroup(
             @NotEmpty @RequestParam("name") String name,
             @NotEmpty @RequestParam("description") String description
     ) throws UserDoesNotExistsException, ObjectNotHashableException {
-
+        this.logger.info("Serving Payment Group Creation | name {} | description {}", name, description);
         PaymentGroupDAO paymentGroupDAO = this.paymentGroupService.createPaymentGroup(name, description);
         return this.paymentGroupASM.toModel(paymentGroupDAO).add(
                 WebMvcLinkBuilder.linkTo(PaymentGroupController.class).withSelfRel()
@@ -61,6 +65,7 @@ public class PaymentGroupController {
     public PaymentGroupModel getOnePaymentGroup(
             @PathVariable("id") PaymentGroupDAO paymentGroupDAO
     ) throws ObjectNotHashableException, UserDoesNotExistsException, InsufficientPermissionException {
+        this.logger.info("Serving GET of payment group | payment group {}", paymentGroupDAO.toString());
         if(this.aclService.hasPermissionTo(paymentGroupDAO, AccessLevel.READ)) {
             return this.paymentGroupASM.toModel(paymentGroupDAO)
                     .add(WebMvcLinkBuilder.linkTo(PaymentGroupController.class).withSelfRel());
@@ -77,6 +82,7 @@ public class PaymentGroupController {
     public CollectionModel<PaymentGroupModel> getAll(
             @PathVariable("id") UserDAO userDAO
     ){
+        this.logger.info("Serving GET of all Payment Groups of user {}", userDAO.toString());
         List<PaymentGroupDAO> paymentGroupDAOList =
                 this.paymentGroupService.getAllPaymentGroups(userDAO);
 
@@ -89,9 +95,9 @@ public class PaymentGroupController {
 
     @GetMapping("/all")
     public CollectionModel<PaymentGroupModel> getAll() throws UserDoesNotExistsException {
+        this.logger.info("Serving all Payment Groups of User {}", this.userService.getLoggedInUser().toString());
         List<PaymentGroupDAO> paymentGroupDAOList =
                 this.paymentGroupService.getAllPaymentGroups();
-
         return this.paymentGroupASM
                 .toCollectionModel(paymentGroupDAOList)
                 .add(
@@ -101,6 +107,7 @@ public class PaymentGroupController {
 
     @GetMapping("/all/brief")
     public CollectionModel<BriefPaymentGroupModel> getAllPaymentGroupsBrief() throws UserDoesNotExistsException {
+        this.logger.info("Serving Brief list of Payment Groups of user {}", this.userService.getLoggedInUser().toString());
         List<PaymentGroupDAO> paymentGroupDAOList =
                 this.paymentGroupService.getAllPaymentGroups();
         return this.briefPaymentGroupASM.toCollectionModel(paymentGroupDAOList)
@@ -111,6 +118,11 @@ public class PaymentGroupController {
     public String requestJoin(
             @NotEmpty @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO
     ) throws UserDoesNotExistsException, ObjectNotHashableException {
+        this.logger.info(
+                "Serving request to join of user {} to group {}",
+                this.userService.getLoggedInUser().toString(),
+                paymentGroupDAO.toString()
+        );
         PaymentGroupDAO modifiedPaymentGroup =
                 this.paymentGroupService.requestJoinPaymentGroup(paymentGroupDAO);
         return " ";
@@ -121,6 +133,11 @@ public class PaymentGroupController {
             @NotEmpty @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO,
             @NotEmpty @RequestParam("user_id") UserDAO userDAO
     ) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToRequestToJoinListException {
+        this.logger.info(
+                "Serving approvement of user {} to group {}",
+                userDAO.toString(),
+                paymentGroupDAO.toString()
+        );
         PaymentGroupDAO paymentGroupDAOModified =
                 this.paymentGroupService.approveToPaymentGroup(
                         paymentGroupDAO, userDAO
@@ -133,6 +150,11 @@ public class PaymentGroupController {
     public String leave(
             @PathVariable("payment_group_id") PaymentGroupDAO paymentGroupDAO
     ) throws UserDoesNotExistsException, UserHasPendingPaymentRequestException, ObjectNotHashableException, InsufficientPermissionException {
+        this.logger.info(
+                "Serving leave of user {} from payment group {}",
+                this.userService.getLoggedInUser().toString(),
+                paymentGroupDAO.toString()
+        );
         this.paymentGroupService.leavePaymentGroup(paymentGroupDAO);
         return " ";
     }
@@ -142,6 +164,11 @@ public class PaymentGroupController {
             @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO,
             @Size(min = 1) @RequestParam("new_name") String newName
     ) throws UserDoesNotExistsException, InsufficientPermissionException, ObjectNotHashableException {
+        this.logger.info(
+                "Serving change name of group {} to new name {}",
+                paymentGroupDAO.toString(),
+                newName
+        );
         PaymentGroupDAO newPaymentGroup =
                 this.paymentGroupService.changeName(paymentGroupDAO, newName);
         return this.paymentGroupASM.toModel(newPaymentGroup)
@@ -153,6 +180,11 @@ public class PaymentGroupController {
             @RequestParam("payment_group_id") PaymentGroupDAO paymentGroupDAO,
             @Size(min = 1) @RequestParam("new_description") String newDescription
     ) throws UserDoesNotExistsException, InsufficientPermissionException, ObjectNotHashableException {
+        this.logger.info(
+                "Serving change of name of group {} to new description {}",
+                paymentGroupDAO.toString(),
+                newDescription
+        );
         PaymentGroupDAO newPaymentGroup =
                 this.paymentGroupService.changeDescription(paymentGroupDAO, newDescription);
         return this.paymentGroupASM.toModel(newPaymentGroup)

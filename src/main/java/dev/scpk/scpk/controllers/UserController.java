@@ -7,6 +7,8 @@ import dev.scpk.scpk.hateoas.assembler.UserASM;
 import dev.scpk.scpk.hateoas.model.full.UserModel;
 import dev.scpk.scpk.services.BindingResultResolver;
 import dev.scpk.scpk.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.validation.BindingResult;
@@ -28,11 +30,14 @@ public class UserController {
     @Autowired
     private BindingResultResolver bindingResultResolver;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @PostMapping("/register")
     public UserModel register(
             @Valid UserDAO userDAO,
             BindingResult bindingResult
     ) throws UserAlreadyExistsException, BindingResultException {
+        this.logger.info("Serving register of new user with data {}", userDAO.toString());
         this.bindingResultResolver.check(bindingResult);
         UserDAO registeredUser =
             this.userService.register(userDAO);
