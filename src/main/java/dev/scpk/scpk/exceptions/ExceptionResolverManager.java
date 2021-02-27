@@ -17,13 +17,25 @@ public class ExceptionResolverManager {
     @Autowired
     private MethodArgumentTypeMismatchExceptionResolver methodArgumentTypeMismatchExceptionResolver;
 
+    @Autowired
+    private UserHasPendingPaymentRequestExceptionResolver userHasPendingPaymentRequestExceptionResolver;
+
     @PostConstruct
     public void loadErrorResolvers(){
         this.errorResolverList = List.of(
                 new BindingResultExceptionResolver(),
                 new MissingServletRequestParameterExceptionResolver(),
-                constraintViolationExceptionResolver,
-                methodArgumentTypeMismatchExceptionResolver
+                this.constraintViolationExceptionResolver,
+                this.methodArgumentTypeMismatchExceptionResolver,
+                this.userHasPendingPaymentRequestExceptionResolver,
+                new InsufficientPermissionExceptionResolver(),
+                new MissingIdForHashExceptionResolver(),
+                new ObjectNotHashableExceptionResolver(),
+                new PaymentRequestDoesNotExistExceptionResolver(),
+                new PaymentGroupDoesNotExistsExceptionResolver(),
+                new UserAlreadyExistsExceptionResolver(),
+                new UserDoesNotExistsExceptionResolver(),
+                new UserDoesNotBelongToRequestToJoinListExceptionResolver()
         );
     }
 
