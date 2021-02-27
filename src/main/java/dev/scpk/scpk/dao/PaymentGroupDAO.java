@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.SneakyThrows;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -16,9 +17,9 @@ public class PaymentGroupDAO extends DAO implements SecurityHashable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull @NotEmpty
     private String name;
-    @NotNull
+    @NotNull @NotEmpty
     private String description;
 
     @ManyToMany

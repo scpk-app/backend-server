@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import javax.validation.ConstraintViolationException;
 
 @ControllerAdvice
 @RestController
@@ -26,6 +29,18 @@ public class ErrorHandlersControllers {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorModel handle(MissingServletRequestParameterException ex){
+        return this.exceptionResolverManager.resolve(ex);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorModel handle(ConstraintViolationException ex){
+        return this.exceptionResolverManager.resolve(ex);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorModel handle(MethodArgumentTypeMismatchException ex){
         return this.exceptionResolverManager.resolve(ex);
     }
 }
