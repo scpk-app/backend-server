@@ -34,4 +34,4 @@ mvn run
     system performance and stability
     
 # Links
-- [docker](https://hub.docker.com/repository/docker/ptylczynski/sckp-backend)
+- [Docker](https://hub.docker.com/repository/docker/ptylczynski/sckp-backend)
