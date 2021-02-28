@@ -20,6 +20,6 @@ public class UserDoesNotBelongToRequestToJoinListExceptionResolver extends Abstr
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(UserDoesNotBelongToRequestToJoinListException.class);
+        return exception.getClass().equals(UserDoesNotBelongToRequestToJoinListException.class);
     }
 }

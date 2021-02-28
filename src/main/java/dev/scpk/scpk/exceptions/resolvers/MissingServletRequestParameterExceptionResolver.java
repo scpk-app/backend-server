@@ -16,6 +16,6 @@ public class MissingServletRequestParameterExceptionResolver extends AbstractExc
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(MissingServletRequestParameterException.class);
+        return exception.getClass().equals(MissingServletRequestParameterException.class);
     }
 }

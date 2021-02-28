@@ -32,6 +32,6 @@ public class MethodArgumentTypeMismatchExceptionResolver extends AbstractExcepti
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(MethodArgumentTypeMismatchException.class);
+        return exception.getClass().equals(MethodArgumentTypeMismatchException.class);
     }
 }

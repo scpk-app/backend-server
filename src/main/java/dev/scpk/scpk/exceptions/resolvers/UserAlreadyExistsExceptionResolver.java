@@ -14,6 +14,6 @@ public class UserAlreadyExistsExceptionResolver extends AbstractExceptionResolve
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(UserAlreadyExistsException.class);
+        return exception.getClass().equals(UserAlreadyExistsException.class);
     }
 }

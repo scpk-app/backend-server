@@ -19,6 +19,6 @@ public class InsufficientPermissionExceptionResolver extends AbstractExceptionRe
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(InsufficientPermissionException.class);
+        return exception.getClass().equals(InsufficientPermissionException.class);
     }
 }

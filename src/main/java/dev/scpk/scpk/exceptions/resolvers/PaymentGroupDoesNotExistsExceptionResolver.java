@@ -18,6 +18,6 @@ public class PaymentGroupDoesNotExistsExceptionResolver extends AbstractExceptio
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(PaymentGroupDoesNotExistsException.class);
+        return exception.getClass().equals(PaymentGroupDoesNotExistsException.class);
     }
 }

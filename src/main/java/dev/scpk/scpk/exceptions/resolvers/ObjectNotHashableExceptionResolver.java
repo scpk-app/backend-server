@@ -20,6 +20,6 @@ public class ObjectNotHashableExceptionResolver extends AbstractExceptionResolve
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(ObjectNotHashableException.class);
+        return exception.getClass().equals(ObjectNotHashableException.class);
     }
 }

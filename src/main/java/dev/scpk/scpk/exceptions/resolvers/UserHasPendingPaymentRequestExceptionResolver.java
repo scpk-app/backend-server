@@ -26,6 +26,6 @@ public class UserHasPendingPaymentRequestExceptionResolver extends AbstractExcep
 
     @Override
     public <T extends Exception> Boolean canResolve(T exception) {
-        return exception.getClass().isAssignableFrom(UserHasPendingPaymentRequestException.class);
+        return exception.getClass().equals(UserHasPendingPaymentRequestException.class);
     }
 }
