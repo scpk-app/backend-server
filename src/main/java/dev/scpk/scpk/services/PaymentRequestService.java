@@ -174,7 +174,16 @@ public class PaymentRequestService {
     }
 
     public PaymentGroupDAO addPaymentToPaymentGroup(PaymentGroupDAO paymentGroupDAO, PaymentRequestDAO paymentRequestDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException, PaymentGroupDoesNotExistsException {
+        this.logger.debug(
+                "Adding new payment {} to payment group {}",
+                paymentRequestDAO.toString(),
+                paymentGroupDAO.toString()
+        );
         paymentGroupDAO = this.paymentGroupService.findById(paymentGroupDAO.getId());
+        this.logger.trace(
+                "payment groups found {}",
+                paymentGroupDAO.toString()
+        );
         this.aclService.hasPermissionOrThrowException(paymentGroupDAO, AccessLevel.WRITE);
         paymentGroupDAO.getPaymentRequests().add(paymentRequestDAO);
         this.paymentGroupService.save(paymentGroupDAO);
@@ -189,6 +198,11 @@ public class PaymentRequestService {
 
     // remove payment request and destroy PaymentRequest entity, as free floating PaymentRequest should not exist
     public PaymentGroupDAO removePaymentRequest(PaymentGroupDAO paymentGroupDAO, PaymentRequestDAO paymentRequestDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException {
+        this.logger.debug(
+                "Removing payment request {} from group {}",
+                paymentRequestDAO.toString(),
+                paymentGroupDAO.toString()
+        );
         this.aclService.hasPermissionOrThrowException(paymentGroupDAO, AccessLevel.WRITE);
         this.aclService.hasPermissionOrThrowException(paymentRequestDAO, AccessLevel.MODIFY);
         paymentGroupDAO.getPaymentRequests().remove(paymentRequestDAO);
@@ -198,6 +212,10 @@ public class PaymentRequestService {
     }
 
     public void recalculateUserBalances(PaymentGroupDAO paymentGroupDAO){
+        this.logger.debug(
+                "Recalculating user balances in payment group {}",
+                paymentGroupDAO.toString()
+        );
         List<PaymentRequestDAO> paymentRequestDAOS = paymentGroupDAO.getPaymentRequests();
         // zero all per user saldos
         paymentGroupDAO.setUserBalances(
@@ -310,6 +328,10 @@ public class PaymentRequestService {
     }
 
     public void delete(PaymentRequestDAO paymentRequestDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException {
+        this.logger.debug(
+                "Deleting payment request {}",
+                paymentRequestDAO.toString()
+        );
         this.aclService.hasPermissionOrThrowException(paymentRequestDAO, AccessLevel.MODIFY);
         this.paymentRequestRepository.delete(paymentRequestDAO);
     }
