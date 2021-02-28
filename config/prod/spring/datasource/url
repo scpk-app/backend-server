@@ -1,1 +1,1 @@
-jdbc:mysql://localhost:3306/scpk
+jdbc:mysql://172.17.0.1:3306/scpk
