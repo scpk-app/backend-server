@@ -9,6 +9,8 @@ import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.UserBalanceRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,14 @@ public class UserBalanceService {
     @Autowired
     private PerUserSaldoService perUserSaldoService;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public UserBalanceDAO createUserBalance(UserDAO userDAO, PaymentGroupDAO paymentGroupDAO) throws ObjectNotHashableException, UserDoesNotExistsException {
+        this.logger.debug(
+                "Creating new user balance for user {} in payment group {}",
+                userDAO.toString(),
+                paymentGroupDAO.toString()
+        );
         UserBalanceDAO userBalanceDAO = new UserBalanceDAO();
         userBalanceDAO.setUser(userDAO);
         userBalanceDAO.setSaldos(new ArrayList<>());
@@ -58,6 +67,11 @@ public class UserBalanceService {
     }
 
     public void remove(UserBalanceDAO userBalanceDAO, PaymentGroupDAO paymentGroupDAO) throws ObjectNotHashableException, InsufficientPermissionException, UserDoesNotExistsException {
+        this.logger.debug(
+                "Removin user balance {} in payment group {}",
+                userBalanceDAO.toString(),
+                paymentGroupDAO.toString()
+        );
         this.aclService.hasPermissionOrThrowException(userBalanceDAO, AccessLevel.MODIFY);
         List<UserBalanceDAO> userBalanceDAOS = paymentGroupDAO.getUserBalances();
         UserDAO userToRemove = userBalanceDAO.getUser();
@@ -69,6 +83,9 @@ public class UserBalanceService {
                             ).findFirst().get();
             this.perUserSaldoService.remove(perUserSaldoDAO);
         }
+        this.logger.trace(
+                "Removed saldo in other user balances"
+        );
         paymentGroupDAO.getUserBalances().remove(userBalanceDAO);
         this.userBalanceRepository.delete(userBalanceDAO);
     }
