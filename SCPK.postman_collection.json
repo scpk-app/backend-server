@@ -6,7 +6,322 @@
 	},
 	"item": [
 		{
-			"name": "get time",
+			"name": "user",
+			"item": [
+				{
+					"name": "post register user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment group",
+			"item": [
+				{
+					"name": "get all groups brief",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/all/brief/",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"all",
+								"brief",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post create payment group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all payment groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/all/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"all",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get one payment group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch leave payment group",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/leave/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"leave",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch request join",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/requestJoin?payment_group_id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"requestJoin"
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch approve",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/approve/?payment_group_id=1&user_id=2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"approve",
+								""
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								},
+								{
+									"key": "user_id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch change name",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/change/name?payment_group_id=1&new_name=new test name 21",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"change",
+								"name"
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								},
+								{
+									"key": "new_name",
+									"value": "new test name 21"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch change description",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/paymentGroup/change/description?payment_group_id=1&new_description=another test description",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"paymentGroup",
+								"change",
+								"description"
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								},
+								{
+									"key": "new_description",
+									"value": "another test description"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "payment request",
+			"item": [
+				{
+					"name": "patch add payment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/payment/add?payment_group_id=1&charged_users_id=1, 2&value=20",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payment",
+								"add"
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								},
+								{
+									"key": "charged_users_id",
+									"value": "1, 2"
+								},
+								{
+									"key": "value",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "patch remove payment request",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/payment/remove?payment_group_id=1&payment_request_id=11",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payment",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								},
+								{
+									"key": "payment_request_id",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all payment requests by paymet group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/payment/get/requested/byGroup/?payment_group_id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payment",
+								"get",
+								"requested",
+								"byGroup",
+								""
+							],
+							"query": [
+								{
+									"key": "payment_group_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all in which charged",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get whoami",
 			"request": {
 				"method": "GET",
 				"header": [],
