@@ -163,7 +163,7 @@ public class PaymentGroupService {
 
     public PaymentGroupDAO approveToPaymentGroup(PaymentGroupDAO paymentGroupDAO, UserDAO userDAO) throws UserDoesNotExistsException, ObjectNotHashableException, InsufficientPermissionException, UserDoesNotBelongToRequestToJoinListException {
         // check if user has proper permissions to read and write to group
-        ExtendedUser userToAdd = UserService.convertToExtendedUser(userDAO);
+        ExtendedUser userToAdd = this.userService.convertToExtendedUser(userDAO);
         ExtendedUser userAdding = this.userService.getLoggedInUser();
         // user adding can write to group
         this.aclService.hasPermissionOrThrowException(paymentGroupDAO, userAdding, AccessLevel.MODIFY);

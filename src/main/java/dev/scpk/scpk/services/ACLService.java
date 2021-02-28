@@ -178,7 +178,7 @@ public class ACLService {
     public <T extends DAO> void grantPermission(T object, UserDAO userDAO, AccessLevel accessLevel) throws ObjectNotHashableException, UserDoesNotExistsException {
         this.grantPermission(
                 object,
-                UserService.convertToExtendedUser(userDAO),
+                this.userService.convertToExtendedUser(userDAO),
                 accessLevel
         );
     }

@@ -18,7 +18,7 @@ public class UserDetailService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return UserService.convertToExtendedUser(
+        return this.userService.convertToExtendedUser(
                 this.userService.findOne(s)
         );
     }
