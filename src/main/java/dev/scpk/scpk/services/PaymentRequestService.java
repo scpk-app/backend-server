@@ -8,6 +8,8 @@ import dev.scpk.scpk.exceptions.security.ObjectNotHashableException;
 import dev.scpk.scpk.exceptions.UserDoesNotExistsException;
 import dev.scpk.scpk.repositories.PaymentRequestRepository;
 import dev.scpk.scpk.security.acl.AccessLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -31,8 +33,17 @@ public class PaymentRequestService {
     @Autowired
     private UserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     // called on first appearance, not only to safe object, but also grant all permissions to new owner
     public PaymentRequestDAO create(List<UserDAO> chargedUsers, PaymentGroupDAO paymentGroupDAO, UserDAO requestedBy, Double value) throws ObjectNotHashableException, UserDoesNotExistsException {
+        this.logger.debug(
+                "Creating new Payment Request Object, charged users {}, payment group {}, requested by {}, value {}",
+                chargedUsers.toString(),
+                paymentGroupDAO.toString(),
+                requestedBy.toString(),
+                value.toString()
+        );
         PaymentRequestDAO paymentRequestDAO = new PaymentRequestDAO();
         paymentRequestDAO.setCharged(chargedUsers);
         paymentRequestDAO.setPaymentGroup(paymentGroupDAO);
@@ -41,6 +52,9 @@ public class PaymentRequestService {
         paymentRequestDAO = this.paymentRequestRepository.save(paymentRequestDAO);
         this.aclService.grantPermission(paymentRequestDAO, AccessLevel.ALL);
         try {
+            this.logger.trace(
+                    "Saving payment request"
+            );
             this.paymentRequestRepository.save(paymentRequestDAO);
         }
         catch (UnsupportedOperationException ex){
@@ -63,35 +77,76 @@ public class PaymentRequestService {
 
     // only saves, not granting permissions - convention
     public PaymentRequestDAO save(PaymentRequestDAO paymentRequestDAO){
+        this.logger.debug(
+                "Saving payment request {}",
+                paymentRequestDAO.toString()
+        );
         return this.paymentRequestRepository.save(paymentRequestDAO);
     }
 
     public PaymentRequestDAO findOneById(Long id) throws PaymentRequestDoesNotExistException {
         // should not evaluate permissions because of usage in components not responsible for permission
         // evaluation
+        this.logger.debug(
+                "Searching for payment request with id {}",
+                id.toString()
+        );
         Optional<PaymentRequestDAO> paymentRequestDAO =
                 this.paymentRequestRepository.findById(id);
-        if(paymentRequestDAO.isEmpty())
+        if(paymentRequestDAO.isEmpty()){
+            this.logger.trace(
+                    "There is not payment request with given id"
+            );
             throw new PaymentRequestDoesNotExistException(id);
-        else
+        }
+        else {
+            this.logger.trace(
+                    "Payment request found {}",
+                    paymentRequestDAO.get().toString()
+            );
             return paymentRequestDAO.get();
+        }
     }
 
     public List<PaymentRequestDAO> getAllRequested(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException {
+        this.logger.debug(
+                "Searching for all requested payments in payment group {} for user {}",
+                paymentGroupDAO.toString(),
+                this.userService.getLoggedInUser().toString()
+        );
         List<PaymentRequestDAO> paymentRequestDAOS = this.findAllByPaymentGroup(paymentGroupDAO);
+        this.logger.trace(
+                "Payment requests found {}",
+                paymentRequestDAOS.toString()
+        );
         UserDAO loggedInUser = this.userService.convertToUserDAO(
                 this.userService.getLoggedInUser()
         );
         paymentRequestDAOS = paymentRequestDAOS.stream()
                 .filter(
-                        paymentRequestDAO -> paymentRequestDAO.getRequestedBy().equals(loggedInUser)
+                        paymentRequestDAO ->
+                                paymentRequestDAO.getRequestedBy().equals(loggedInUser)
                 ).collect(Collectors.toList());
+        this.logger.trace(
+                "After filtration for user {} remains {}",
+                loggedInUser.toString(),
+                paymentRequestDAOS.toString()
+        );
         return this.aclService.filter(paymentRequestDAOS, AccessLevel.READ);
     }
 
     // fetch payment request and filter by permission
     public List<PaymentRequestDAO> getAllInWhichUserCharged(PaymentGroupDAO paymentGroupDAO) throws UserDoesNotExistsException {
+        this.logger.debug(
+                "Searching for payment requests in which user {} was charged in paymet group {}",
+                this.userService.getLoggedInUser().toString(),
+                paymentGroupDAO.toString()
+        );
         List<PaymentRequestDAO> paymentRequestDAOS = this.findAllByPaymentGroup(paymentGroupDAO);
+        this.logger.trace(
+                "Payment requests found {}",
+                paymentRequestDAOS.toString()
+        );
         UserDAO loggedInUser = this.userService.convertToUserDAO(
                 this.userService.getLoggedInUser()
         );
@@ -105,6 +160,11 @@ public class PaymentRequestService {
                                         userDAO -> userDAO.equals(loggedInUser)
                                 )
                 ).collect(Collectors.toList());
+        this.logger.trace(
+                "After filtration for user {} remains {}",
+                loggedInUser.toString(),
+                paymentRequestDAOS.toString()
+        );
         return this.aclService.filter(paymentRequestDAOS, AccessLevel.READ);
     }
 
