@@ -23,7 +23,7 @@ Backend server for scpk app
 
 ## Build
 ```bash
-mvn run
+mvn spring-boot:run
 ```
 
 # Considerations
